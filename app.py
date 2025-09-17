@@ -1,5 +1,4 @@
 import fitz
-
 from embeddingsMaker import embed_chunks
 from chromadb_client import store_embeddings
 
@@ -26,11 +25,12 @@ def chunK_text(text, chunk_size=1000, overlap=200):
     while start < len(text):
         end = min(start + chunk_size, len(text))
         chunks.append(text[start:end])
+        embed_chunks(text[start:end])
         start += chunk_size - overlap
 
     return chunks
 
 
 chunks = chunK_text(text)
-embeddings = embed_chunks(chunks)
-save_to_chromaDB = store_embeddings(embeddings)
+
+
