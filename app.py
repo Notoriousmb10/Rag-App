@@ -1,6 +1,5 @@
 import fitz
-from embeddingsMaker import embed_chunks
-from chromadb_client import store_embeddings
+from embeddingsMaker import embed_chunks_and_store
 
 
 def pdfExtractor(pdf_path):
@@ -19,18 +18,17 @@ text = pdfExtractor("harryPotter1.pdf")
 
 
 def chunK_text(text, chunk_size=1000, overlap=200):
-    chunks = []
     start = 0
+    chunksArray = []
 
     while start < len(text):
         end = min(start + chunk_size, len(text))
-        chunks.append(text[start:end])
-        embed_chunks(text[start:end])
+        chunksArray.append(text[start:end])
         start += chunk_size - overlap
 
-    return chunks
+    return chunksArray
 
 
 chunks = chunK_text(text)
-
-
+for i in range(len(chunks)):
+    embed_chunks_and_store(chunks[i], i)

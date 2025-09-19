@@ -1,17 +1,22 @@
-import google.generativeai as genai
+import chromadb
+import uuid
+from sentence_transformers import SentenceTransformer
 
-genai.configure(api_key="AIzaSyC7sroFqmgwJ7M0")
+client = chromadb.Client()
+client = chromadb.PersistentClient(path="./chroma_db") 
+collection = client.create_collection('harry_potter')
+model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
 
 
-def embed_chunks(chunk):
-    chunk_embeddings = []
-        res = genai.embed_content(model="models/embedding-001", content=chunk)
-        chunk_embeddings.append({"text": chunk, "embedding": res["embedding"]})
-        
-        
-        
-    
-    
-        
+def embed_chunks_and_store(chunk, idx):
+    try:
+        embedding = model.encode(chunk).tolist()
+        collection.add(
+            ids=[f"chunk-{idx}-{uuid.uuid4().hex[:6]}"],
+            documents=[chunk],
+            embeddings=[embedding]
+        )
+        print(f"Stored chunk-{idx}")
 
-    
+    except Exception as e:
+        print(f"Error processing chunk-{idx}: {e}")
